@@ -1,0 +1,56 @@
+﻿<Window x:Class="DBExtractor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DBExtractor"
+        xmlns:entities="clr-namespace:ExtractorUtils.Entities;assembly=ExtractorUtils"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="650" Width="825">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Border Grid.Row="0" Grid.ColumnSpan="3" Background="#AAAAAA" >
+        </Border>
+        <TextBlock Text="OCTGN Set Generator" Margin="5" />
+        <!--   <Button Grid.Column="2" Width="50" Margin="5" Content="Browse" Click="Button_Click"/> -->
+        <Border Grid.Row="1" Grid.ColumnSpan="3" Background="Brown" >
+        </Border>
+        <Grid Grid.Row="1" Grid.ColumnSpan="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TreeView Margin="5" x:Name="SetsPanel" Background="White" Opacity="0.7" SelectedItemChanged="UpdateDataGrid">
+                <TreeView.Resources>
+                    <HierarchicalDataTemplate DataType="{x:Type entities:Card}">
+                        <TextBlock Text="{Binding Name}" />
+                    </HierarchicalDataTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type entities:Set}" ItemsSource="{Binding Cards}">
+                        <TextBlock Text="{Binding Name}" />
+                    </HierarchicalDataTemplate>
+                </TreeView.Resources>
+            </TreeView>
+            <DataGrid Grid.Column="1" IsReadOnly="True" x:Name="OutputGrid" AutoGenerateColumns="False"
+                      AlternatingRowBackground="LightGray"  AlternationCount="2">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="Auto" />
+                    <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="Auto" />
+                    <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="Auto" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+        <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="1">
+            <Button  Width="Auto" Margin="5" Content="Update selected set" Click="UpdateXml"/>
+            <Button  Width="Auto" Margin="5" Content="Update all OCTGN sets" Click="UpdateAllXml"/>
+        </StackPanel>
+    </Grid>
+</Window>

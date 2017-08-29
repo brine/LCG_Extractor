@@ -1,0 +1,45 @@
+﻿<xml>
+  <cardsUrl value="http://www.thronesdb.com/api/public/cards/" />
+  <packsUrl value="http://www.thronesdb.com/api/public/packs/" />
+  <dbImageUrl value="http://www.thronesdb.com/bundles/cards/" />
+  <cgImageUrl value="http://lcg-cdn.fantasyflightgames.com/got2nd/" />
+  <properties>
+    <property octgn_name="Type" db_name="type_name" />
+    <property octgn_name="Faction" db_name="faction_name" />
+    <property octgn_name="Text" db_name="text" type="Rich"/>
+    <property octgn_name="Traits" db_name="traits" />
+    <property octgn_name="Unique" db_name="is_unique" type="Bool"/>
+    <property octgn_name="Loyal" db_name="is_loyal" type="Bool"/>
+    <property octgn_name="Cost" db_name="cost" />
+    <property octgn_name="Strength" db_name="strength" />
+    <property octgn_name="Deck Limit" db_name="deck_limit" />
+    <property octgn_name="Income" db_name="income" />
+    <property octgn_name="Initiative" db_name="initiative" />
+    <property octgn_name="Claim" db_name="claim" />
+    <property octgn_name="Reserve" db_name="reserve" />
+    <property octgn_name="Illustrator" db_name="illustrator" />
+    <property octgn_name="Card Number" db_name="position" />
+  </properties>
+  <sizes>
+    <size name="HorizontalCards">
+      <match property="Type" value="Plot"/>
+    </size>
+  </sizes>
+  <symbols>
+    <symbol match="[thenightswatch]" id="nightswatch" name="[The Night's Watch]" />
+    <symbol match="[baratheon]" id="baratheon" name="[House Baratheon]" />
+    <symbol match="[targaryen]" id="targaryen" name="[House Targaryen]" />
+    <symbol match="[stark]" id="stark" name="[House Stark]" />
+    <symbol match="[martell]" id="martell" name="[House Martell]" />
+    <symbol match="[tyrell]" id="tyrell" name="[House Tyrell]" />
+    <symbol match="[lannister]" id="lannister" name="[House Lannister]" />
+    <symbol match="[greyjoy]" id="greyjoy" name="[House Greyjoy]" />
+    <symbol match="[intrigue]" id="intrigue" name="[Intrigue]" />
+    <symbol match="[military]" id="military" name="[Military]" />
+    <symbol match="[power]" id="power" name="[Power]" />
+  </symbols>
+  <replaces>
+    <replace match="&lt;em&gt;" value="&lt;i&gt;" />
+    <replace match="&lt;/em&gt;" value="&lt;/i&gt;" />
+  </replaces>
+</xml>

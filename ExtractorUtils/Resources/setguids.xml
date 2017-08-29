@@ -1,0 +1,54 @@
+﻿<xml>
+  <sets>
+    <cycle value="0">
+      <set name="1" cgdb_id="00" value="acefd680-bd02-4d95-8c23-f5c6207ee0df" />
+    </cycle>
+    <cycle value="1">
+      <set name="1" cgdb_id="01" value="c64ccfe4-8aea-4c65-9611-3e46739813d9" />
+    </cycle>
+    <cycle value="2">
+      <set name="1" cgdb_id="02" value="7f08ef9f-dd47-415b-b002-827a0defcd2a" />
+      <set name="2" cgdb_id="03" value="755e0c90-42bc-4a0f-9b9e-993db8ea0bef" />
+      <set name="3" cgdb_id="04" value="979959f5-9470-40f9-9ca7-82463cd505ab" />
+      <set name="4" cgdb_id="05" value="a47e6b27-6772-4377-ad04-a9270d6bb64e" />
+      <set name="5" cgdb_id="06" value="5c608b83-e15e-41ad-8472-91b40db7904f" />
+      <set name="6" cgdb_id="07" value="fece0ab4-574e-43c6-847d-8d726e2e242e" />
+    </cycle>
+    <cycle value="3">
+      <set name="1" cgdb_id="08" value="83472677-8ef3-47f9-a400-cbb7fb443524" />
+    </cycle>
+    <cycle value="4">
+      <set name="1" cgdb_id="09" value="050bca18-a9b2-4c77-967a-6b57406b05f5" />
+      <set name="2" cgdb_id="10" value="92d586ff-7958-4dc7-93d5-81775cae923f" />
+      <set name="3" cgdb_id="11" value="cd23b5eb-cfea-496b-9399-236ceb44824f" />
+      <set name="4" cgdb_id="12" value="a5f4fb88-e5bc-4095-9ad3-2d0e3e02855a" />
+      <set name="5" cgdb_id="13" value="734fd1b7-7e11-4c89-87f6-f94d8b497b90" />
+      <set name="6" cgdb_id="14" value="2bec1d8b-c5a3-492f-b00d-8bcf97e9063b" />
+    </cycle>
+    <cycle value="5">
+      <set name="1" cgdb_id="15" value="8247133c-a928-4437-a602-2001cc3d3ba4" />
+    </cycle>
+    <cycle value="6">
+      <set name="1" cgdb_id="16" value="ec00725d-1ec3-4433-9ebb-9a781eed4c89" />
+      <set name="2" cgdb_id="17" value="1eb8e1b2-a26a-437e-b724-890079d81ed7" />
+      <set name="3" cgdb_id="18" value="4d2f5898-4952-4886-b16b-5a5a5aad1e50" />
+      <set name="4" cgdb_id="19" value="3c9a65d1-df30-4755-a7a8-8272e1553146" />
+      <set name="5" cgdb_id="20" value="83973c3a-e11d-4f4a-9831-9000dd3f2012" />
+      <set name="6" cgdb_id="21" value="297055a2-4c83-4e95-9b61-40bd5b387b76" />
+    </cycle>
+    <cycle value="7">
+      <set name="1" cgdb_id="22" value="b91e6b81-67e8-44b8-a11a-460065a99e22" />
+    </cycle>
+    <cycle value="8">
+      <set name="1" cgdb_id="23" value="c71c87cb-6037-438f-8f78-1319c5046ff1" />
+      <set name="2" cgdb_id="24" value="594e41c9-0596-437a-9a76-c3fb96ff6f0f" />
+      <set name="3" cgdb_id="25" value="f465a230-e432-48cc-8efd-0fc3e6bfc1ec" />
+      <set name="4" cgdb_id="26" value="cb7022d4-d653-44ba-8c3a-76c7e0a2d0b3" />
+      <set name="5" cgdb_id="27" value="098b49d4-966e-4bc9-8ae6-b82c4ebba22e" />
+      <set name="6" cgdb_id="28" value="772355bb-0d7a-4691-a1fc-68d9b4da5d43" />
+    </cycle>
+    <cycle value="9">
+      <set name="1" cgdb_id="29" value="19aa6871-7706-454b-9f10-af863ff5b98e" />
+    </cycle>
+  </sets>
+</xml>
