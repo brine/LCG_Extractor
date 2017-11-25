@@ -97,7 +97,7 @@ namespace DBExtractor
                 {
                     XmlNode prop = xml.CreateElement("property");
                     prop.Attributes.Append(CreateAttribute(xml, "name", kvi.Key.OctgnName));
-                    if (kvi.Key.Type == PropertyTypes.Rich || kvi.Key.OctgnName == "Icons")
+                    if (kvi.Key.IsRich)
                     {
                         var propdoc = new XmlDocument();
                         propdoc.LoadXml("<root>" + kvi.Value + "</root>");

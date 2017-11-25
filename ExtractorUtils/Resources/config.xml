@@ -4,21 +4,41 @@
   <dbImageUrl value="http://www.thronesdb.com/bundles/cards/" />
   <cgImageUrl value="http://lcg-cdn.fantasyflightgames.com/got2nd/" />
   <properties>
-    <property octgn_name="Type" db_name="type_name" />
-    <property octgn_name="Faction" db_name="faction_name" />
-    <property octgn_name="Text" db_name="text" type="Rich"/>
-    <property octgn_name="Traits" db_name="traits" />
-    <property octgn_name="Unique" db_name="is_unique" type="Bool"/>
-    <property octgn_name="Loyal" db_name="is_loyal" type="Bool"/>
-    <property octgn_name="Cost" db_name="cost" />
-    <property octgn_name="Strength" db_name="strength" />
-    <property octgn_name="Deck Limit" db_name="deck_limit" />
-    <property octgn_name="Income" db_name="income" />
-    <property octgn_name="Initiative" db_name="initiative" />
-    <property octgn_name="Claim" db_name="claim" />
-    <property octgn_name="Reserve" db_name="reserve" />
-    <property octgn_name="Illustrator" db_name="illustrator" />
-    <property octgn_name="Card Number" db_name="position" />
+    <property octgn_name="Type" type="property" value="type_name" />
+    <property octgn_name="Faction" type="property" value="faction_name" />
+    <property octgn_name="Text" type="property" value="text" isRich="True"/>
+    <property octgn_name="Traits" type="property" value="traits" />
+    <property octgn_name="Unique" type="property" value="is_unique" >
+      <replace match="True" value="Yes" />
+      <replace match="False" value="No" />
+    </property>
+    <property octgn_name="Loyal" type="property" value="is_loyal" >
+      <replace match="True" value="Yes" />
+      <replace match="False" value="No" />
+    </property>
+    <property octgn_name="Cost" type="property" value="cost" />
+    <property octgn_name="Strength" type="property" value="strength" />
+    <property octgn_name="Deck Limit" type="property" value="deck_limit" />
+    <property octgn_name="Income" type="property" value="income" />
+    <property octgn_name="Initiative" type="property" value="initiative" />
+    <property octgn_name="Claim" type="property" value="claim" />
+    <property octgn_name="Reserve" type="property" value="reserve" />
+    <property octgn_name="Illustrator" type="property" value="illustrator" />
+    <property octgn_name="Card Number" type="property" value="position" />
+    <property octgn_name="Icons" isRich="True">
+      <run type="property" value="is_military">
+        <replace match="True" value="[military]" />
+        <replace match="False" value="" />
+      </run>
+      <run type="property" value="is_intrigue">
+        <replace match="True" value="[intrigue]" />
+        <replace match="False" value="" />
+      </run>
+      <run type="property" value="is_power">
+        <replace match="True" value="[power]" />
+        <replace match="False" value="" />
+      </run>
+    </property>
   </properties>
   <sizes>
     <size name="HorizontalCards">
@@ -39,7 +59,5 @@
     <symbol match="[power]" id="power" name="[Power]" />
   </symbols>
   <replaces>
-    <replace match="&lt;em&gt;" value="&lt;i&gt;" />
-    <replace match="&lt;/em&gt;" value="&lt;/i&gt;" />
   </replaces>
 </xml>

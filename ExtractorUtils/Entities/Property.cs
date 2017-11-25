@@ -8,16 +8,22 @@ namespace ExtractorUtils.Entities
 {
     public enum PropertyTypes
     {
-        Bool,
-        Rich,
-        String
+        STRING,
+        PROPERTY
     }
 
+    public class Run
+    {
+        public string Value { get; set; }
+        public Dictionary<string, string> Replace { get; set; }
+        public PropertyTypes Type { get; set; }
+    }
+    
     public class Property
     {
+        public bool IsRich { get; set; }
         public string OctgnName { get; set; }
-        public string DbName { get; set; }
-        public PropertyTypes Type { get; set; }
+        public List<Run> Run { get; set; }
 
         public Property()
         { }

@@ -31,11 +31,33 @@ namespace ExtractorUtils
             {
                 var prop = new Property()
                 {
-                    DbName = propdef.Attribute("db_name").Value,
                     OctgnName = propdef.Attribute("octgn_name").Value,
-                    Type = (PropertyTypes) Enum.Parse(typeof (PropertyTypes),
-                        propdef.Attribute("type") == null ? "String" : propdef.Attribute("type").Value)
+                    Run = new List<Run>(),
+                    IsRich = propdef.Attribute("isRich") == null ? false : bool.Parse(propdef.Attribute("isRich").Value)
                 };
+
+                var items = new List<XElement>();
+                items.Add(propdef);
+                items.AddRange(propdef.Descendants("run"));
+
+                foreach (var runitem in items)
+                {
+                    if (runitem.Attribute("value") == null) continue;
+
+                    var run = new Run()
+                    {
+                        Value = runitem.Attribute("value").Value,
+                        Replace = new Dictionary<string, string>(),
+                        Type = (PropertyTypes) Enum.Parse(typeof (PropertyTypes),
+                            runitem.Attribute("type") == null ? "STRING" : runitem.Attribute("type").Value.ToUpper())
+                    };
+                    foreach (var replace in runitem.Descendants("replace"))
+                    {
+                        run.Replace.Add(replace.Attribute("match").Value, replace.Attribute("value").Value);
+                    }
+                    prop.Run.Add(run);
+                }
+                
                 CardProperties.Add(prop);
             }
             if (doc.Descendants("size") != null)
@@ -83,44 +105,39 @@ namespace ExtractorUtils
                 };
                 foreach (var prop in CardProperties)
                 {
-                    var value = jcard.Value<string>(prop.DbName);
-                    if (value != null)
+                    var propertyValue = new StringBuilder();
+                    foreach (var run in prop.Run)
                     {
-                        if (prop.Type == PropertyTypes.Bool)
-                            value = (value == "True") ? "Yes" : "No";
-                        else if (prop.Type == PropertyTypes.Rich)
+                        if (run.Type == PropertyTypes.STRING)
                         {
-                            value = MakeXMLSafe(value);
-                            foreach (var symbol in Symbols)
-                            {
-                                value = value.Replace(symbol.Match, string.Format("<s value=\"{0}\">{1}</s>", symbol.Id, symbol.Name));
-                            }
+                            var value = MakeXMLSafe(run.Value);
+                            propertyValue.Append(value);
                         }
                         else
-                            value = MakeXMLSafe(value);
-                        card.Properties.Add(prop, value);
+                        {
+                            var value = jcard.Value<string>(run.Value);
+                            if (value != null)
+                            {
+                                value = MakeXMLSafe(value);
+                                foreach (var replace in run.Replace)
+                                {
+                                    value = value.Replace(replace.Key, replace.Value);
+                                }
+                                if (prop.IsRich)
+                                {
+                                    foreach (var symbol in Symbols)
+                                    {
+                                        value = value.Replace(symbol.Match, string.Format("<s value=\"{0}\">{1}</s>", symbol.Id, symbol.Name));
+                                    }
+                                }
+                                propertyValue.Append(value);
+                            }
+                        }
                     }
+                    if (!string.IsNullOrWhiteSpace(propertyValue.ToString()))
+                        card.Properties.Add(prop, propertyValue.ToString());
                 }
-
-                #region agotstuff
-                //TODO: Make this a generic type
-
-                var iconsProp = new Property()
-                {
-                    OctgnName = "Icons",
-                    Type = PropertyTypes.String
-                };
-                string iconsValue = "";
-                if (jcard.Value<string>("is_military") == "True")
-                    iconsValue += "[military]";
-                if (jcard.Value<string>("is_intrigue") == "True")
-                    iconsValue += "[intrigue]";
-                if (jcard.Value<string>("is_power") == "True")
-                    iconsValue += "[power]";
-                if (iconsValue != "")
-                    card.Properties.Add(iconsProp, MakeXMLSafe(iconsValue));
-                #endregion
-
+                
                 foreach (var size in CardSizes)
                 {
                     bool isMatch = true;
@@ -175,6 +192,8 @@ namespace ExtractorUtils
         {
             makeSafe = makeSafe.Replace("&", "&amp;");
             makeSafe = makeSafe.Replace("\n", "&#xd;&#xa;");
+            makeSafe = makeSafe.Replace("<em>", "<i>");
+            makeSafe = makeSafe.Replace("</em>", "</i>");
             return (makeSafe);
         }
     }
