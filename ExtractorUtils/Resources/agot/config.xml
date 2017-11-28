@@ -3,6 +3,7 @@
   <packsUrl value="http://www.thronesdb.com/api/public/packs/" />
   <dbImageUrl value="http://www.thronesdb.com/bundles/cards/" />
   <cgImageUrl value="http://lcg-cdn.fantasyflightgames.com/got2nd/" />
+  <octgnGuid value="30c200c9-6c98-49a4-a293-106c06295c05" />
   <properties>
     <property octgn_name="Type" type="property" value="type_name" />
     <property octgn_name="Faction" type="property" value="faction_name" />

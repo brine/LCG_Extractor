@@ -9,12 +9,12 @@ namespace ExtractorUtils.Entities
     public class Card
     {
         public string Name { get; set; }
-        public Guid Id { get; set; }
-        public string Size { get; set; }
+        public string Id { get; set; }
+        public string Position { get; set; }
         public string Pack { get; set; }
+        public string Image { get; set; }
+        public string Size { get; set; }
         public Set Set { get; set; }
-        public string DbImageUrl { get; set; }
-        public string CgImageUrl { get; set; }
         public Dictionary<Property, string> Properties { get; set; }
 
         public Card()

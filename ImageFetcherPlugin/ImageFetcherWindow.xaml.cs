@@ -12,6 +12,7 @@ using System.Windows.Controls;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using ExtractorUtils;
+using Octgn.DataNew;
 
 namespace ImageFetcherPlugin
 {
@@ -25,11 +26,25 @@ namespace ImageFetcherPlugin
         public DBGenerator database;
 
         public bool OverwriteBool = false;
-        public bool UseThronesDb = true;
+        public int SelectedItemSource = 0;
 
         public ImageFetcherWindow()
         {
+            if (cards == null)
+            {
+                var game = DbContext.Get().GameById(Guid.Parse("bb0f02e7-2a6f-4ae3-84a2-c501b4176844")) ?? throw new Exception("Legend of the Five Rings is not installed!");
+             //   var game = DbContext.Get().GameById(Guid.Parse("30C200C9-6C98-49A4-A293-106C06295C05")) ?? throw new Exception("Game of Thrones is not installed!");
+                cards = game.AllCards();
+            }
+
+            if (database == null)
+            {
+                database = new DBGenerator();
+            }
+            
             this.InitializeComponent();
+
+            DbComboBox.ItemsSource = database.ImageSources;
             this.Closing += CancelWorkers;
             backgroundWorker.WorkerReportsProgress = true;
             backgroundWorker.WorkerSupportsCancellation = true;
@@ -59,7 +74,7 @@ namespace ImageFetcherPlugin
             {
                 if (backgroundWorker.CancellationPending) break;
                 i++;
-                var dbcard = database.cardList.FirstOrDefault(x => x.Id == card.Id);
+                var dbcard = database.cardList.FirstOrDefault(x => x.Id == card.Id.ToString());
                 if (dbcard == null) continue;
 
                 var cardset = card.GetSet();
@@ -88,19 +103,10 @@ namespace ImageFetcherPlugin
                 
                 var url = "";
                 var newPath = "";
-                
 
-                if (UseThronesDb) // thronesdb
-                {
-                    url = database.dbImageUrl + dbcard.DbImageUrl + ".png";
-                    newPath = System.IO.Path.Combine(cardset.ImagePackUri, imageUri + ".png");
-                }
-                else
-                {
-                    url = database.cgImageUrl + dbcard.Set.cgCode + "_" + dbcard.CgImageUrl + ".jpg";
-                    newPath = System.IO.Path.Combine(cardset.ImagePackUri, imageUri + ".jpg");
-                }
-                
+
+                url = string.Format(database.ImageSources[SelectedItemSource].Url, dbcard.Image, dbcard.Position, dbcard.Name, dbcard.Id);
+                newPath = System.IO.Path.Combine(cardset.ImagePackUri, imageUri + ".png");
 
                 using (WebClient webClient = new WebClient())
                 {
@@ -157,7 +163,7 @@ namespace ImageFetcherPlugin
 
         private void DatabaseSelector(object sender, RoutedEventArgs e)
         {
-            UseThronesDb = (sender as ComboBox).SelectedIndex == 0;
+            SelectedItemSource = (sender as ComboBox).SelectedIndex;
         }
     }
 }

@@ -74,7 +74,7 @@ namespace DBExtractor
             XmlNode root = xml.CreateElement("set");
             root.Attributes.Append(CreateAttribute(xml, "name", set.Name));
             root.Attributes.Append(CreateAttribute(xml, "id", set.Id));
-            root.Attributes.Append(CreateAttribute(xml, "gameId", "30c200c9-6c98-49a4-a293-106c06295c05"));
+            root.Attributes.Append(CreateAttribute(xml, "gameId", database.gameGuid.ToString()));
             root.Attributes.Append(CreateAttribute(xml, "version", "1.0.0.0"));
             root.Attributes.Append(CreateAttribute(xml, "gameVersion", "1.0.0.0"));
             xml.AppendChild(root);
@@ -87,7 +87,7 @@ namespace DBExtractor
             {
                 XmlNode cardNode = xml.CreateElement("card");
                 cardNode.Attributes.Append(CreateAttribute(xml, "name", c.Name));
-                cardNode.Attributes.Append(CreateAttribute(xml, "id", c.Id.ToString()));
+                cardNode.Attributes.Append(CreateAttribute(xml, "id", c.Id));
                 if (c.Size != null)
                 {
                     cardNode.Attributes.Append(CreateAttribute(xml, "size", c.Size));

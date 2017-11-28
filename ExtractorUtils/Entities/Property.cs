@@ -22,8 +22,10 @@ namespace ExtractorUtils.Entities
     public class Property
     {
         public bool IsRich { get; set; }
+        public bool Capitalize { get; set; }
         public string OctgnName { get; set; }
         public List<Run> Run { get; set; }
+        public string Delimiter { get; set; }
 
         public Property()
         { }

@@ -8,24 +8,53 @@ using ExtractorUtils.Entities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net;
+using System.Globalization;
+using Octgn.DataNew;
+using Octgn.Core.DataExtensionMethods;
 
 namespace ExtractorUtils
 {
     public class DBGenerator
     {
+        public XDocument doc;
         public List<Card> cardList = new List<Card>();
         public List<Set> setList = new List<Set>();
         public List<Property> CardProperties = new List<Property>();
         public List<Size> CardSizes = new List<Size>();
         public List<Symbol> Symbols = new List<Symbol>();
-        public string dbImageUrl;
-        public string cgImageUrl;
+        public List<ImageSource> ImageSources = new List<ImageSource>();
+        public Guid gameGuid;
+        public string cardNumberField;
+        public string octgnCardNumberField;
+        public string cardNameField;
+        public string packIdField;
+        public string cardIdField;
+        public string cardImageField;
 
         public DBGenerator()
         {
-            var doc = XDocument.Parse(Properties.Resources.config);
-            dbImageUrl = doc.Document.Descendants("dbImageUrl").First().Attribute("value").Value;
-            cgImageUrl = doc.Document.Descendants("cgImageUrl").First().Attribute("value").Value;
+            doc = XDocument.Parse(Properties.Resources.config);
+            var gameData = doc.Document.Descendants("game").First();
+            
+            gameGuid = Guid.Parse(gameData.Attribute("gameGuid").Value);
+            octgnCardNumberField = gameData.Attribute("octgnCardNumber").Value;
+            cardNumberField = gameData.Attribute("cardNumber").Value;
+            cardNameField = gameData.Attribute("cardName").Value;
+            packIdField = gameData.Attribute("packId").Value;
+            cardIdField = gameData.Attribute("cardId").Value;
+            cardImageField = gameData.Attribute("cardImage").Value;
+
+            // load image sources
+            foreach (var imgdef in doc.Descendants("image"))
+            {
+                var imgsrc = new ImageSource()
+                {
+                    Name = imgdef.Attribute("name").Value,
+                    Url = imgdef.Attribute("url").Value
+                };
+                ImageSources.Add(imgsrc);
+            }
+
             // load card properties
             foreach (var propdef in doc.Descendants("property"))
             {
@@ -33,7 +62,9 @@ namespace ExtractorUtils
                 {
                     OctgnName = propdef.Attribute("octgn_name").Value,
                     Run = new List<Run>(),
-                    IsRich = propdef.Attribute("isRich") == null ? false : bool.Parse(propdef.Attribute("isRich").Value)
+                    IsRich = propdef.Attribute("isRich") == null ? false : bool.Parse(propdef.Attribute("isRich").Value),
+                    Capitalize = propdef.Attribute("capitalize") == null ? false : bool.Parse(propdef.Attribute("capitalize").Value),
+                    Delimiter = propdef.Attribute("delimiter") == null ? null : propdef.Attribute("delimiter").Value 
                 };
 
                 var items = new List<XElement>();
@@ -89,53 +120,47 @@ namespace ExtractorUtils
                 }
             }
             // load cards
-            JArray jsonCards = (JArray)JsonConvert.DeserializeObject(
+            
+            var jsonCardData = JsonConvert.DeserializeObject(
                 new WebClient().DownloadString(
-                    doc.Document.Descendants("cardsUrl").First().Attribute("value").Value));
+                    gameData.Attribute("cardsUrl").Value));
+            
+            var jsonCards = (jsonCardData is JArray) ? (JArray)jsonCardData : JsonConverter.ConvertCardJson(jsonCardData as JObject);
 
             foreach (var jcard in jsonCards)
             {
                 var card = new Card()
                 {
-                    Name = jcard.Value<string>("name"),
-                    Pack = jcard.Value<string>("pack_code"),
-                    DbImageUrl = jcard.Value<string>("code"),
-                    CgImageUrl = jcard.Value<string>("position"),
-                    Id = jcard.Value<string>("octgn_id") == null ? Guid.NewGuid() : Guid.Parse(jcard.Value<string>("octgn_id"))
+                    Name = jcard.Value<string>(cardNameField),
+                    Pack = jcard.Value<string>(packIdField),
+                    Id = jcard.Value<string>(cardIdField),
+                    Position = jcard.Value<string>(cardNumberField),
+                    Image = jcard.Value<string>(cardImageField)
                 };
+                
                 foreach (var prop in CardProperties)
                 {
-                    var propertyValue = new StringBuilder();
+                    var valueList = new List<string>();
                     foreach (var run in prop.Run)
                     {
                         if (run.Type == PropertyTypes.STRING)
                         {
-                            var value = MakeXMLSafe(run.Value);
-                            propertyValue.Append(value);
+                            valueList.Add(ProcessPropertyValue(run.Value, prop, run));
                         }
                         else
                         {
-                            var value = jcard.Value<string>(run.Value);
-                            if (value != null)
-                            {
-                                value = MakeXMLSafe(value);
-                                foreach (var replace in run.Replace)
-                                {
-                                    value = value.Replace(replace.Key, replace.Value);
-                                }
-                                if (prop.IsRich)
-                                {
-                                    foreach (var symbol in Symbols)
-                                    {
-                                        value = value.Replace(symbol.Match, string.Format("<s value=\"{0}\">{1}</s>", symbol.Id, symbol.Name));
-                                    }
-                                }
-                                propertyValue.Append(value);
-                            }
+                            var valuetoken = jcard.Value<object>(run.Value);
+                            if (valuetoken == null) continue;
+                            if (valuetoken is JArray)
+                                valueList.AddRange((valuetoken as JArray).Select(x => ProcessPropertyValue(x.ToString(), prop, run)));
+                            else
+                                valueList.Add(ProcessPropertyValue(valuetoken.ToString(), prop, run));
                         }
                     }
-                    if (!string.IsNullOrWhiteSpace(propertyValue.ToString()))
-                        card.Properties.Add(prop, propertyValue.ToString());
+
+                    var value = String.Join(prop.Delimiter, valueList.Where(x => !string.IsNullOrWhiteSpace(x)));
+                    if (!string.IsNullOrWhiteSpace(value))
+                        card.Properties.Add(prop, value);
                 }
                 
                 foreach (var size in CardSizes)
@@ -160,32 +185,85 @@ namespace ExtractorUtils
             }
 
             // load sets
-            JArray jsonPacks = (JArray)JsonConvert.DeserializeObject(
-                new WebClient().DownloadString(
-                    doc.Document.Descendants("packsUrl").First().Attribute("value").Value));
 
+            var jsonPackData = JsonConvert.DeserializeObject(
+                new WebClient().DownloadString(
+                    gameData.Attribute("packsUrl").Value));
+
+            var jsonPacks = (jsonPackData is JArray) ? (JArray)jsonPackData : ((JObject)jsonPackData).Descendants().First(x => x is JArray);
             var setGuidTable = XDocument.Parse(Properties.Resources.setguids);
+
             foreach (var jset in jsonPacks)
             {
                 //  if (jset.Value<string>("available") == "") continue;
-                var setConfig = setGuidTable.Descendants("cycle")
-                        .First(x => x.Attribute("value").Value == jset.Value<string>("cycle_position"))
-                        .Descendants("set")
-                        .First(x => x.Attribute("name").Value == jset.Value<string>("position"));
+                var setConfig = setGuidTable
+                            .Descendants("set")
+                            .First(x =>
+                            (x.Attribute("id") != null && x.Attribute("id").Value == jset.Value<string>("id"))
+                            ||
+                            (x.Attribute("position") != null && x.Attribute("position").Value == jset.Value<string>("position")
+                            &&
+                            x.Attribute("cycle") != null && x.Attribute("cycle").Value == jset.Value<string>("cycle_position")));
+
+                var cardGuidList = setConfig.Descendants("card");
+
                 var set = new Set()
                 {
                     Id = setConfig.Attribute("value").Value,
                     Name = jset.Value<string>("name"),
-                    dbCode = jset.Value<string>("code"),
+                    dbCode = jset.Value<string>("code") ?? jset.Value<string>("id"),
                     cgCode = "GT" + setConfig.Attribute("cgdb_id").Value,
                 };
                 set.Cards = new List<Card>(cardList.Where(x => x.Pack == set.dbCode));
                 foreach (var card in set.Cards)
                 {
                     card.Set = set;
+                    if (card.Id == null)
+                    {
+                        var cardIdData = cardGuidList.FirstOrDefault(x => x.Attribute("position") != null && x.Attribute("position").Value == card.Position);
+                        card.Id = (cardIdData == null) ? FindOctgnGuid(card) : cardIdData.Attribute("id").Value;
+                    }
                 }
                 setList.Add(set);
             }
+        }
+        
+        private string FindOctgnGuid(Card card)
+        {
+
+            var octgnCard = DbContext.Get().GameById(gameGuid).AllCards()
+                        .FirstOrDefault(x => x.Properties[""].Properties
+                        .First(y => y.Key.Name == octgnCardNumberField).Value.ToString() == card.Position
+                        && x.SetId.ToString() == card.Set.Id);
+            if (octgnCard != null)
+            {
+                return octgnCard.Id.ToString();
+            }
+            return Guid.NewGuid().ToString();
+        }
+    
+        public string ProcessPropertyValue(string value, Property prop, Run run)
+        {
+            if (value != null)
+            {
+                value = MakeXMLSafe(value);
+                foreach (var replace in run.Replace)
+                {
+                    value = value.Replace(replace.Key, replace.Value);
+                }
+                if (prop.Capitalize)
+                {
+                    value = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(value);
+                }
+                if (prop.IsRich)
+                {
+                    foreach (var symbol in Symbols)
+                    {
+                        value = value.Replace(symbol.Match, string.Format("<s value=\"{0}\">{1}</s>", symbol.Id, symbol.Name));
+                    }
+                }
+            }
+            return value;
         }
 
         public static string MakeXMLSafe(string makeSafe)

@@ -62,15 +62,15 @@ namespace ExtractorUtils.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to &lt;xml&gt;
-        ///  &lt;cardsUrl value=&quot;http://www.thronesdb.com/api/public/cards/&quot; /&gt;
-        ///  &lt;packsUrl value=&quot;http://www.thronesdb.com/api/public/packs/&quot; /&gt;
+        ///  &lt;cardsUrl value=&quot;https://api.fiveringsdb.com/cards/&quot; /&gt;
+        ///  &lt;packsUrl value=&quot;https://api.fiveringsdb.com/packs/&quot; /&gt;
         ///  &lt;dbImageUrl value=&quot;http://www.thronesdb.com/bundles/cards/&quot; /&gt;
         ///  &lt;cgImageUrl value=&quot;http://lcg-cdn.fantasyflightgames.com/got2nd/&quot; /&gt;
         ///  &lt;properties&gt;
-        ///    &lt;property octgn_name=&quot;Type&quot; db_name=&quot;type_name&quot; /&gt;
-        ///    &lt;property octgn_name=&quot;Faction&quot; db_name=&quot;faction_name&quot; /&gt;
-        ///    &lt;property octgn_name=&quot;Text&quot; db_name=&quot;text&quot; type=&quot;Rich&quot;/&gt;
-        ///    &lt;property octgn_name=&quot;Traits&quot; db_ [rest of string was truncated]&quot;;.
+        ///    &lt;property octgn_name=&quot;Type&quot; type=&quot;property&quot; value=&quot;type_name&quot; /&gt;
+        ///    &lt;property octgn_name=&quot;Faction&quot; type=&quot;property&quot; value=&quot;faction_name&quot; /&gt;
+        ///    &lt;property octgn_name=&quot;Text&quot; type=&quot;property&quot; value=&quot;text&quot; isRich=&quot;True&quot;/&gt;
+        ///    &lt;prop [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string config {
             get {
@@ -82,15 +82,15 @@ namespace ExtractorUtils.Properties {
         ///   Looks up a localized string similar to &lt;xml&gt;
         ///  &lt;sets&gt;
         ///    &lt;cycle value=&quot;0&quot;&gt;
-        ///      &lt;set name=&quot;1&quot; cgdb_id=&quot;00&quot; value=&quot;acefd680-bd02-4d95-8c23-f5c6207ee0df&quot; /&gt;
+        ///      &lt;set name=&quot;1&quot; cgdb_id=&quot;00&quot; value=&quot;b9353360-2f08-4517-a7d0-960b085d6ba4&quot; /&gt;
         ///    &lt;/cycle&gt;
         ///    &lt;cycle value=&quot;1&quot;&gt;
-        ///      &lt;set name=&quot;1&quot; cgdb_id=&quot;01&quot; value=&quot;c64ccfe4-8aea-4c65-9611-3e46739813d9&quot; /&gt;
+        ///      &lt;set name=&quot;1&quot; cgdb_id=&quot;01&quot; value=&quot;7a1d7bfd-db29-4812-8de1-01cf7ca73323&quot; /&gt;
         ///    &lt;/cycle&gt;
         ///    &lt;cycle value=&quot;2&quot;&gt;
-        ///      &lt;set name=&quot;1&quot; cgdb_id=&quot;02&quot; value=&quot;7f08ef9f-dd47-415b-b002-827a0defcd2a&quot; /&gt;
-        ///      &lt;set name=&quot;2&quot; cgdb_id=&quot;03&quot; value=&quot;755e0c90-42bc-4a0f-9b9e-993db8ea0bef&quot; /&gt;
-        ///      &lt;set name=&quot;3&quot; cgdb_id=&quot;04&quot; value=&quot;979959f5-9470-40f9-9ca7-82463c [rest of string was truncated]&quot;;.
+        ///      &lt;set name=&quot;1&quot; cgdb_id=&quot;02&quot; value=&quot;84b585e5-12b1-4a6f-ab58-e995eb79795b&quot; /&gt;
+        ///      &lt;set name=&quot;2&quot; cgdb_id=&quot;03&quot; value=&quot;ea59d7d7-5a8b-48e5-b246-229625967603&quot; /&gt;
+        ///      &lt;set name=&quot;3&quot; cgdb_id=&quot;04&quot; value=&quot;840be9ee-a905-4316-8a25-1b8149 [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string setguids {
             get {

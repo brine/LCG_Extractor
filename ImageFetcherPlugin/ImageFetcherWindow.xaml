@@ -18,9 +18,7 @@
             <CheckBox Click="Overwrite" Content="Overwrite Existing Images" Foreground="Black" />
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Download Images From:" />
-                <ComboBox x:Name="DbComboBox" SelectedIndex="0" SelectionChanged="DatabaseSelector" MinWidth="70">
-                    <ComboBoxItem Content="Thronesdb.com" />
-                    <ComboBoxItem Content="Cardgamedb.com"/>
+                <ComboBox x:Name="DbComboBox" SelectedIndex="0" SelectionChanged="DatabaseSelector" MinWidth="70" DisplayMemberPath="Name">
                 </ComboBox>
             </StackPanel>
         </StackPanel>
