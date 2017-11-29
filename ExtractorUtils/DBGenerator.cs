@@ -120,13 +120,14 @@ namespace ExtractorUtils
                 }
             }
             // load cards
-            
-            var jsonCardData = JsonConvert.DeserializeObject(
-                new WebClient().DownloadString(
-                    gameData.Attribute("cardsUrl").Value));
-            
-            var jsonCards = (jsonCardData is JArray) ? (JArray)jsonCardData : JsonConverter.ConvertCardJson(jsonCardData as JObject);
 
+            JArray jsonCards;
+            using (var webclient = new WebClient() { Encoding = Encoding.UTF8 })
+            {
+                var jsonCardData = JsonConvert.DeserializeObject(webclient.DownloadString(gameData.Attribute("cardsUrl").Value));
+                jsonCards = (jsonCardData is JArray) ? (JArray)jsonCardData : JsonConverter.ConvertCardJson(jsonCardData as JObject);
+            };
+                        
             foreach (var jcard in jsonCards)
             {
                 var card = new Card()
@@ -186,11 +187,13 @@ namespace ExtractorUtils
 
             // load sets
 
-            var jsonPackData = JsonConvert.DeserializeObject(
-                new WebClient().DownloadString(
-                    gameData.Attribute("packsUrl").Value));
-
-            var jsonPacks = (jsonPackData is JArray) ? (JArray)jsonPackData : ((JObject)jsonPackData).Descendants().First(x => x is JArray);
+            JArray jsonPacks;
+            using (var webclient = new WebClient() { Encoding = Encoding.UTF8 })
+            {
+                var jsonPackData = JsonConvert.DeserializeObject(webclient.DownloadString(gameData.Attribute("packsUrl").Value));
+                jsonPacks = (jsonPackData is JArray) ? (JArray)jsonPackData : ((JObject)jsonPackData).Descendants().First(x => x is JArray) as JArray;
+            };
+            
             var setGuidTable = XDocument.Parse(Properties.Resources.setguids);
 
             foreach (var jset in jsonPacks)
