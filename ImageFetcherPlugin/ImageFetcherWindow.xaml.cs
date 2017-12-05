@@ -59,6 +59,10 @@ namespace ImageFetcherPlugin
                 return;
             }
             ProgressBar.Maximum = cards.Count();
+            DbComboBox.IsEnabled = false;
+            OverwriteCheckbox.IsEnabled = false;
+            GenerateBox.Visibility = Visibility.Collapsed;
+            CancelBox.Visibility = Visibility.Visible;
             backgroundWorker.RunWorkerAsync();
         }
 
@@ -75,6 +79,7 @@ namespace ImageFetcherPlugin
                 if (dbcard == null) continue;
 
                 var cardset = card.GetSet();
+
                 var garbage = Config.Instance.Paths.GraveyardPath;
                 if (!Directory.Exists(garbage)) Directory.CreateDirectory(garbage);
 
@@ -103,19 +108,41 @@ namespace ImageFetcherPlugin
 
 
                 url = string.Format(database.ImageSources[SelectedItemSource].Url, dbcard.Image, dbcard.Position, dbcard.Name, dbcard.Id, dbcard.Set.SetNumber, dbcard.Set.SetCode);
-                newPath = System.IO.Path.Combine(cardset.ImagePackUri, imageUri + ".png");
+                newPath = System.IO.Path.Combine(cardset.ImagePackUri, imageUri);
 
                 using (WebClient webClient = new WebClient())
                 {
                     try
                     {
-                        webClient.DownloadFile(new Uri(url), newPath);
+                        byte[] fileBytes = webClient.DownloadData(url);
+
+                        string fileType = webClient.ResponseHeaders[HttpResponseHeader.ContentType];
+
+                        if (fileType != null)
+                        {
+                            switch (fileType)
+                            {
+                                case "image/jpeg":
+                                    newPath += ".jpg";
+                                    System.IO.File.WriteAllBytes(newPath, fileBytes);
+                                    break;
+                                case "image/gif":
+                                    newPath += ".gif";
+                                    System.IO.File.WriteAllBytes(newPath, fileBytes);
+                                    break;
+                                case "image/png":
+                                    newPath += ".png";
+                                    System.IO.File.WriteAllBytes(newPath, fileBytes);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
                     }
                     catch
                     {
 
                     }
-                    
                 }
                 backgroundWorker.ReportProgress(i, card);
             }
@@ -126,6 +153,7 @@ namespace ImageFetcherPlugin
             ProgressBar.Value = e.ProgressPercentage;
             CurrentCard.Text = (e.UserState as Card).Name;
             Stream imageStream = File.OpenRead((e.UserState as Card).GetPicture());
+            imageStream.Position = 0;
 
             var ret = new BitmapImage();
             ret.BeginInit();
@@ -133,6 +161,7 @@ namespace ImageFetcherPlugin
             ret.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
             ret.StreamSource = imageStream;
             ret.EndInit();
+            ret.Freeze();
             imageStream.Close();
 
             dbImage.Source = ret;
@@ -142,6 +171,10 @@ namespace ImageFetcherPlugin
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             CurrentCard.Text = "DONE";
+            DbComboBox.IsEnabled = true;
+            OverwriteCheckbox.IsEnabled = true;
+            GenerateBox.Visibility = Visibility.Visible;
+            CancelBox.Visibility = Visibility.Collapsed;
         }
 
         private void CancelWorkers(object sender, EventArgs e)
@@ -150,6 +183,10 @@ namespace ImageFetcherPlugin
             {
                 CurrentCard.Text = "Cancel";
                 backgroundWorker.CancelAsync();
+                DbComboBox.IsEnabled = true;
+                OverwriteCheckbox.IsEnabled = true;
+                GenerateBox.Visibility = Visibility.Visible;
+                CancelBox.Visibility = Visibility.Collapsed;
             }
         }
 

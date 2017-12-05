@@ -15,7 +15,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <StackPanel Orientation="Vertical">
-            <CheckBox Click="Overwrite" Content="Overwrite Existing Images" Foreground="Black" />
+            <CheckBox x:Name="OverwriteCheckbox" Click="Overwrite" Content="Overwrite Existing Images" Foreground="Black" />
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Download Images From:" />
                 <ComboBox x:Name="DbComboBox" SelectedIndex="0" SelectionChanged="DatabaseSelector" MinWidth="70" DisplayMemberPath="Name">
@@ -31,7 +31,8 @@
             <Image x:Name="dlImage" Grid.Column="1"/>
         </Grid>
         <StackPanel Grid.Row="2" Orientation="Horizontal">
-            <Button Content="Generate" Click="Generate"/>
+            <Button x:Name="GenerateBox" Content="Generate" Click="Generate"/>
+            <Button x:Name="CancelBox" Content="Cancel" Click="CancelWorkers" Visibility="Collapsed"/>
             <TextBlock Text="Loading:" />
             <TextBlock x:Name="CurrentCard" />
         </StackPanel>
