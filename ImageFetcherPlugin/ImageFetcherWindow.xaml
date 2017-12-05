@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ImageFetcherPlugin"
         mc:Ignorable="d" 
-        Title="A Game of Thrones Image Fetcher"
+        Title="LCG Image Fetcher"
         d:DesignHeight="300" d:DesignWidth="300" Width="300" Height="300">
     <Grid>
         <Grid.RowDefinitions>

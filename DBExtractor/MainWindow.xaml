@@ -22,7 +22,7 @@
         </Border>
         <StackPanel Orientation="Horizontal">
             <TextBlock Text="Select Game:" Margin="5" VerticalAlignment="Center"/>
-            <ComboBox x:Name="GamesList" DisplayMemberPath="Name" Margin="5" SelectionChanged="GameSelector"/>
+            <ComboBox x:Name="GamesList" DisplayMemberPath="Name" Margin="5" MinWidth="70" SelectionChanged="GameSelector"/>
         </StackPanel>
         <!--   <Button Grid.Column="2" Width="50" Margin="5" Content="Browse" Click="Button_Click"/> -->
         <Border Grid.Row="1" Grid.ColumnSpan="3" Background="Brown" >
