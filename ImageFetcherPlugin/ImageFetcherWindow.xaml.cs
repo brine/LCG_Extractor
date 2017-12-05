@@ -30,18 +30,15 @@ namespace ImageFetcherPlugin
 
         public ImageFetcherWindow()
         {
-            if (cards == null)
-            {
-                var game = DbContext.Get().GameById(Guid.Parse("bb0f02e7-2a6f-4ae3-84a2-c501b4176844")) ?? throw new Exception("Legend of the Five Rings is not installed!");
-             //   var game = DbContext.Get().GameById(Guid.Parse("30C200C9-6C98-49A4-A293-106C06295C05")) ?? throw new Exception("Game of Thrones is not installed!");
-                cards = game.AllCards();
-            }
 
             if (database == null)
             {
-                database = new DBGenerator();
+                //var game = DbContext.Get().GameById(Guid.Parse("bb0f02e7-2a6f-4ae3-84a2-c501b4176844")) ?? throw new Exception("Legend of the Five Rings is not installed!");
+                var game = DbContext.Get().GameById(Guid.Parse("30C200C9-6C98-49A4-A293-106C06295C05")) ?? throw new Exception("Game of Thrones is not installed!");
+                database = new DBGenerator(game);
+                cards = game.AllCards();
             }
-            
+
             this.InitializeComponent();
 
             DbComboBox.ItemsSource = database.ImageSources;
@@ -105,7 +102,7 @@ namespace ImageFetcherPlugin
                 var newPath = "";
 
 
-                url = string.Format(database.ImageSources[SelectedItemSource].Url, dbcard.Image, dbcard.Position, dbcard.Name, dbcard.Id);
+                url = string.Format(database.ImageSources[SelectedItemSource].Url, dbcard.Image, dbcard.Position, dbcard.Name, dbcard.Id, dbcard.Set.SetNumber, dbcard.Set.SetCode);
                 newPath = System.IO.Path.Combine(cardset.ImagePackUri, imageUri + ".png");
 
                 using (WebClient webClient = new WebClient())

@@ -14,6 +14,9 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using ExtractorUtils;
 using ExtractorUtils.Entities;
+using Octgn.DataNew;
+using Octgn.DataNew.Entities;
+using Set = ExtractorUtils.Entities.Set;
 
 namespace DBExtractor
 {
@@ -22,17 +25,33 @@ namespace DBExtractor
     /// </summary>
     public partial class MainWindow : Window
     {
+        public List<DBGenerator> databases;
+
         public DBGenerator database;
+        
 
         public MainWindow()
         {
             this.InitializeComponent();
-            database = new DBGenerator();
+            databases = new List<DBGenerator>();
+            var games = DbContext.Get().Games.Where(x => DBGenerator.ValidGame(x));
+            GamesList.ItemsSource = games;
+
+        }
+        
+        private void GameSelector(object sender, SelectionChangedEventArgs e)
+        {
+            var game = (Game)(sender as ComboBox).SelectedItem;
+            database = databases.FirstOrDefault(x => x.gameGuid == game.Id);
+            if (database == null)
+            { 
+                database = new DBGenerator(game);
+                databases.Add(database);
+            };
             
             SetsPanel.ItemsSource = database.setList;
         }
-        
-        
+
         private void UpdateDataGrid(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (e.NewValue is Set)
@@ -53,7 +72,7 @@ namespace DBExtractor
             SaveXml((Set)SetsPanel.SelectedItem);
         }
 
-        private void SaveXml(Set set)
+        private void SaveXml(ExtractorUtils.Entities.Set set)
         {
             if (set == null) return;
             string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -124,5 +143,6 @@ namespace DBExtractor
             ret.Value = value;
             return (ret);
         }
+
     }
 }

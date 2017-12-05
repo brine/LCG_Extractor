@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:DBExtractor"
         xmlns:entities="clr-namespace:ExtractorUtils.Entities;assembly=ExtractorUtils"
         mc:Ignorable="d"
-        Title="MainWindow" Height="650" Width="825">
+        Title="OCTGN Set Editor" Height="650" Width="825">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -20,7 +20,10 @@
         </Grid.ColumnDefinitions>
         <Border Grid.Row="0" Grid.ColumnSpan="3" Background="#AAAAAA" >
         </Border>
-        <TextBlock Text="OCTGN Set Generator" Margin="5" />
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="Select Game:" Margin="5" VerticalAlignment="Center"/>
+            <ComboBox x:Name="GamesList" DisplayMemberPath="Name" Margin="5" SelectionChanged="GameSelector"/>
+        </StackPanel>
         <!--   <Button Grid.Column="2" Width="50" Margin="5" Content="Browse" Click="Button_Click"/> -->
         <Border Grid.Row="1" Grid.ColumnSpan="3" Background="Brown" >
         </Border>

@@ -1,7 +1,7 @@
-﻿<Application x:Class="ThronesExtractor.App"
+﻿<Application x:Class="DBExtractor.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:ThronesExtractor"
+             xmlns:local="clr-namespace:DBExtractor"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          

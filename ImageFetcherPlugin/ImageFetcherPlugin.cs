@@ -15,7 +15,7 @@ using System.Linq;
 namespace ImageFetcherPlugin
 {
 
-    public class ThronesImageFetcher : IDeckBuilderPlugin 
+    public class ImageFetcher : IDeckBuilderPlugin 
     {
         public IEnumerable<IPluginMenuItem> MenuItems
         {
@@ -46,7 +46,7 @@ namespace ImageFetcherPlugin
             get
             {
                 // Display name of the plugin.
-                return "Game of Thrones Image Fetcher";
+                return "LCG Image Fetcher";
             }
         }
 
@@ -76,7 +76,7 @@ namespace ImageFetcherPlugin
         {
             get
             {
-                return "Game of Thrones Image Fetcher";
+                return "LCG Image Fetcher";
             }
         }
 
@@ -86,17 +86,17 @@ namespace ImageFetcherPlugin
         /// <param name="con"></param>
         public void OnClick(IDeckBuilderPluginController con)
         {
-
-            if (con.GetLoadedGame() == null || con.GetLoadedGame().Id.ToString() != "30c200c9-6c98-49a4-a293-106c06295c05")
+            var game = con.GetLoadedGame();
+            if (game == null || !DBGenerator.ValidGame(game))
             {
-                MessageBox.Show("Can only use this plugin for A Game of Thrones Second Edition");
+                MessageBox.Show("This game does not support LCG Image Fetcher");
                 return;
             }
 
             ImageFetcherWindow mainWindow = new ImageFetcherWindow()
             {
-                cards = con.GetLoadedGame().AllCards(),
-                database = new DBGenerator()
+                cards = game.AllCards(),
+                database = new DBGenerator(game)
             };
             mainWindow.ShowDialog();
         }

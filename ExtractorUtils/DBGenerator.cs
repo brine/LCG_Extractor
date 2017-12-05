@@ -11,12 +11,15 @@ using System.Net;
 using System.Globalization;
 using Octgn.DataNew;
 using Octgn.Core.DataExtensionMethods;
+using Game = Octgn.DataNew.Entities.Game;
+using System.IO;
 
 namespace ExtractorUtils
 {
     public class DBGenerator
     {
         public XDocument doc;
+        public XDocument setGuidTable;
         public List<Card> cardList = new List<Card>();
         public List<Set> setList = new List<Set>();
         public List<Property> CardProperties = new List<Property>();
@@ -31,12 +34,18 @@ namespace ExtractorUtils
         public string cardIdField;
         public string cardImageField;
 
-        public DBGenerator()
+        public DBGenerator(Game game)
         {
-            doc = XDocument.Parse(Properties.Resources.config);
-            var gameData = doc.Document.Descendants("game").First();
+            var directory = Path.Combine(game.InstallPath, "Extractor");
+            if (!Directory.Exists(directory)) return;
             
-            gameGuid = Guid.Parse(gameData.Attribute("gameGuid").Value);
+            doc = XDocument.Load(Path.Combine(directory, "config.xml"));
+            setGuidTable = XDocument.Load(Path.Combine(directory, "setguids.xml"));
+                        
+
+            var gameData = doc.Document.Descendants("game").First();
+
+            gameGuid = game.Id;
             octgnCardNumberField = gameData.Attribute("octgnCardNumber").Value;
             cardNumberField = gameData.Attribute("cardNumber").Value;
             cardNameField = gameData.Attribute("cardName").Value;
@@ -194,8 +203,6 @@ namespace ExtractorUtils
                 jsonPacks = (jsonPackData is JArray) ? (JArray)jsonPackData : ((JObject)jsonPackData).Descendants().First(x => x is JArray) as JArray;
             };
             
-            var setGuidTable = XDocument.Parse(Properties.Resources.setguids);
-
             foreach (var jset in jsonPacks)
             {
                 //  if (jset.Value<string>("available") == "") continue;
@@ -214,10 +221,10 @@ namespace ExtractorUtils
                 {
                     Id = setConfig.Attribute("value").Value,
                     Name = jset.Value<string>("name"),
-                    dbCode = jset.Value<string>("code") ?? jset.Value<string>("id"),
-                    cgCode = "GT" + setConfig.Attribute("cgdb_id").Value,
+                    SetCode = jset.Value<string>("code") ?? jset.Value<string>("id"),
+                    SetNumber = setConfig.Attribute("number").Value,
                 };
-                set.Cards = new List<Card>(cardList.Where(x => x.Pack == set.dbCode));
+                set.Cards = new List<Card>(cardList.Where(x => x.Pack == set.SetCode));
                 foreach (var card in set.Cards)
                 {
                     card.Set = set;
@@ -267,6 +274,20 @@ namespace ExtractorUtils
                 }
             }
             return value;
+        }
+
+
+        public static bool ValidGame(Game g)
+        {
+            var directory = Path.Combine(g.InstallPath, "Extractor");
+            if (!Directory.Exists(directory)) return false;
+
+            var files = Directory.GetFiles(directory, "*.xml").Select(x => Path.GetFileName(x)).ToArray();
+
+            if (!files.Contains("setguids.xml")) return false;
+            if (!files.Contains("config.xml")) return false;
+
+            return true;
         }
 
         public static string MakeXMLSafe(string makeSafe)

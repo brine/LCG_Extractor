@@ -10,8 +10,8 @@ namespace ExtractorUtils.Entities
     {
         public string Name { get; set; }
         public string Id { get; set; }
-        public string dbCode { get; set; }
-        public string cgCode { get; set; }
+        public string SetCode { get; set; }
+        public string SetNumber { get; set; }
 
         public List<Card> Cards { get; set; }
 
