@@ -31,6 +31,7 @@ namespace ExtractorUtils
         public string octgnCardNumberField;
         public string cardNameField;
         public string packIdField;
+        public string cardPackIdField;
         public string cardIdField;
         public string cardImageField;
 
@@ -46,10 +47,11 @@ namespace ExtractorUtils
             var gameData = doc.Document.Descendants("game").First();
 
             gameGuid = game.Id;
-            octgnCardNumberField = gameData.Attribute("octgnCardNumber").Value;
+            octgnCardNumberField = gameData.Attribute("cardOctgnNumber").Value;
             cardNumberField = gameData.Attribute("cardNumber").Value;
             cardNameField = gameData.Attribute("cardName").Value;
             packIdField = gameData.Attribute("packId").Value;
+            cardPackIdField = gameData.Attribute("cardPackId").Value;
             cardIdField = gameData.Attribute("cardId").Value;
             cardImageField = gameData.Attribute("cardImage").Value;
 
@@ -142,7 +144,7 @@ namespace ExtractorUtils
                 var card = new Card()
                 {
                     Name = jcard.Value<string>(cardNameField),
-                    Pack = jcard.Value<string>(packIdField),
+                    Pack = jcard.Value<string>(cardPackIdField),
                     Id = jcard.Value<string>(cardIdField),
                     Position = jcard.Value<string>(cardNumberField),
                     Image = jcard.Value<string>(cardImageField)
@@ -208,20 +210,15 @@ namespace ExtractorUtils
                 //  if (jset.Value<string>("available") == "") continue;
                 var setConfig = setGuidTable
                             .Descendants("set")
-                            .First(x =>
-                            (x.Attribute("id") != null && x.Attribute("id").Value == jset.Value<string>("id"))
-                            ||
-                            (x.Attribute("position") != null && x.Attribute("position").Value == jset.Value<string>("position")
-                            &&
-                            x.Attribute("cycle") != null && x.Attribute("cycle").Value == jset.Value<string>("cycle_position")));
+                            .First(x => x.Attribute("id") != null && x.Attribute("id").Value == jset.Value<string>(packIdField));
 
                 var cardGuidList = setConfig.Descendants("card");
 
                 var set = new Set()
                 {
-                    Id = setConfig.Attribute("value").Value,
+                    Guid = setConfig.Attribute("value").Value,
                     Name = jset.Value<string>("name"),
-                    SetCode = jset.Value<string>("code") ?? jset.Value<string>("id"),
+                    SetCode = jset.Value<string>(packIdField),
                     SetNumber = setConfig.Attribute("number").Value,
                 };
                 set.Cards = new List<Card>(cardList.Where(x => x.Pack == set.SetCode));
@@ -230,8 +227,8 @@ namespace ExtractorUtils
                     card.Set = set;
                     if (card.Id == null)
                     {
-                        var cardIdData = cardGuidList.FirstOrDefault(x => x.Attribute("position") != null && x.Attribute("position").Value == card.Position);
-                        card.Id = (cardIdData == null) ? FindOctgnGuid(card) : cardIdData.Attribute("id").Value;
+                        var cardIdData = cardGuidList.FirstOrDefault(x => x.Attribute(cardNumberField) != null && x.Attribute(cardNumberField).Value == card.Position);
+                        card.Id = (cardIdData == null) ? FindOctgnGuid(card) : cardIdData.Attribute(packIdField).Value;
                     }
                 }
                 setList.Add(set);
@@ -244,7 +241,7 @@ namespace ExtractorUtils
             var octgnCard = DbContext.Get().GameById(gameGuid).AllCards()
                         .FirstOrDefault(x => x.Properties[""].Properties
                         .First(y => y.Key.Name == octgnCardNumberField).Value.ToString() == card.Position
-                        && x.SetId.ToString() == card.Set.Id);
+                        && x.SetId.ToString() == card.Set.Guid);
             if (octgnCard != null)
             {
                 return octgnCard.Id.ToString();

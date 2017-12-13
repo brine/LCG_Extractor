@@ -93,11 +93,7 @@ namespace ImageFetcherPlugin
                 return;
             }
 
-            ImageFetcherWindow mainWindow = new ImageFetcherWindow()
-            {
-                cards = game.AllCards(),
-                database = new DBGenerator(game)
-            };
+            ImageFetcherWindow mainWindow = new ImageFetcherWindow(game);
             mainWindow.ShowDialog();
         }
     }

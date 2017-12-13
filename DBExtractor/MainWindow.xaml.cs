@@ -76,7 +76,7 @@ namespace DBExtractor
         {
             if (set == null) return;
             string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            string saveDir = Path.Combine(dir, "Saved", set.Id);
+            string saveDir = Path.Combine(dir, "Saved", set.Guid);
             string savePath = Path.Combine(saveDir, "set.xml");
             if (!Directory.Exists(saveDir))
             {
@@ -92,7 +92,7 @@ namespace DBExtractor
 
             XmlNode root = xml.CreateElement("set");
             root.Attributes.Append(CreateAttribute(xml, "name", set.Name));
-            root.Attributes.Append(CreateAttribute(xml, "id", set.Id));
+            root.Attributes.Append(CreateAttribute(xml, "id", set.Guid));
             root.Attributes.Append(CreateAttribute(xml, "gameId", database.gameGuid.ToString()));
             root.Attributes.Append(CreateAttribute(xml, "version", "1.0.0.0"));
             root.Attributes.Append(CreateAttribute(xml, "gameVersion", "1.0.0.0"));

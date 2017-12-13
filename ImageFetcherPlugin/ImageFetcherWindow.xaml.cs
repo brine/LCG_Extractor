@@ -27,18 +27,25 @@ namespace ImageFetcherPlugin
 
         public bool OverwriteBool = false;
         public int SelectedItemSource = 0;
-
+        
         public ImageFetcherWindow()
         {
+            //var game = DbContext.Get().GameById(Guid.Parse("bb0f02e7-2a6f-4ae3-84a2-c501b4176844")) ?? throw new Exception("Legend of the Five Rings is not installed!");
+            var game = DbContext.Get().GameById(Guid.Parse("30C200C9-6C98-49A4-A293-106C06295C05")) ?? throw new Exception("Game of Thrones is not installed!");
+            database = new DBGenerator(game);
+            cards = game.AllCards();
+            Initialize();
+        }
 
-            if (database == null)
-            {
-                //var game = DbContext.Get().GameById(Guid.Parse("bb0f02e7-2a6f-4ae3-84a2-c501b4176844")) ?? throw new Exception("Legend of the Five Rings is not installed!");
-                var game = DbContext.Get().GameById(Guid.Parse("30C200C9-6C98-49A4-A293-106C06295C05")) ?? throw new Exception("Game of Thrones is not installed!");
-                database = new DBGenerator(game);
-                cards = game.AllCards();
-            }
+        public ImageFetcherWindow(Game game)
+        {
+            database = new DBGenerator(game);
+            cards = game.AllCards();
+            Initialize();
+        }
 
+        public void Initialize()
+        {
             this.InitializeComponent();
 
             DbComboBox.ItemsSource = database.ImageSources;
@@ -48,7 +55,6 @@ namespace ImageFetcherPlugin
             backgroundWorker.DoWork += DoWork;
             backgroundWorker.ProgressChanged += ProgressChanged;
             backgroundWorker.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
-
         }
 
         private void Generate(object sender, RoutedEventArgs e)
@@ -98,10 +104,6 @@ namespace ImageFetcherPlugin
                     continue;
                 }
                 
-                foreach (var f in files.Select(x => new FileInfo(x)))
-                {
-                    f.MoveTo(System.IO.Path.Combine(garbage, f.Name));
-                }
                 
                 var url = "";
                 var newPath = "";
@@ -124,14 +126,20 @@ namespace ImageFetcherPlugin
                             {
                                 case "image/jpeg":
                                     newPath += ".jpg";
+                                    foreach (var f in files.Select(x => new FileInfo(x)))
+                                        f.MoveTo(System.IO.Path.Combine(garbage, f.Name));
                                     System.IO.File.WriteAllBytes(newPath, fileBytes);
                                     break;
                                 case "image/gif":
                                     newPath += ".gif";
+                                    foreach (var f in files.Select(x => new FileInfo(x)))
+                                        f.MoveTo(System.IO.Path.Combine(garbage, f.Name));
                                     System.IO.File.WriteAllBytes(newPath, fileBytes);
                                     break;
                                 case "image/png":
                                     newPath += ".png";
+                                    foreach (var f in files.Select(x => new FileInfo(x)))
+                                        f.MoveTo(System.IO.Path.Combine(garbage, f.Name));
                                     System.IO.File.WriteAllBytes(newPath, fileBytes);
                                     break;
                                 default:
