@@ -76,7 +76,7 @@ namespace DBExtractor
         {
             if (set == null) return;
             string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            string saveDir = Path.Combine(dir, "Saved", set.Guid);
+            string saveDir = Path.Combine(dir, "Saved", database.gameGuid.ToString(), set.Guid);
             string savePath = Path.Combine(saveDir, "set.xml");
             if (!Directory.Exists(saveDir))
             {
