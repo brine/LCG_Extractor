@@ -210,7 +210,8 @@ namespace ExtractorUtils
                 //  if (jset.Value<string>("available") == "") continue;
                 var setConfig = setGuidTable
                             .Descendants("set")
-                            .First(x => x.Attribute("id") != null && x.Attribute("id").Value == jset.Value<string>(packIdField));
+                            .FirstOrDefault(x => x.Attribute("id") != null && x.Attribute("id").Value == jset.Value<string>(packIdField));
+                if (setConfig == null) continue;
 
                 var cardGuidList = setConfig.Descendants("card");
 
