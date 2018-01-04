@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:DBExtractor"
         xmlns:entities="clr-namespace:ExtractorUtils.Entities;assembly=ExtractorUtils"
         mc:Ignorable="d"
-        Title="OCTGN Set Editor" Height="650" Width="825">
+        Title="LCG Database Extractor for OCTGN" Height="650" Width="825">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
