@@ -17,6 +17,7 @@ using ExtractorUtils.Entities;
 using Octgn.DataNew;
 using Octgn.DataNew.Entities;
 using Set = ExtractorUtils.Entities.Set;
+using System.Diagnostics;
 
 namespace DBExtractor
 {
@@ -64,12 +65,21 @@ namespace DBExtractor
             {
                 SaveXml(set);
             }
+            string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string saveDir = Path.Combine(dir, "Saved", database.gameGuid.ToString());
+
+            Process.Start(saveDir);
         }
 
         private void UpdateXml(object sender, RoutedEventArgs e)
         {
             if (SetsPanel.SelectedItem == null) return;
             SaveXml((Set)SetsPanel.SelectedItem);
+
+            string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string saveDir = Path.Combine(dir, "Saved", database.gameGuid.ToString(), (SetsPanel.SelectedItem as Set).Guid);
+
+            Process.Start(saveDir);
         }
 
         private void SaveXml(ExtractorUtils.Entities.Set set)
