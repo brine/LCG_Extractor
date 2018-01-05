@@ -55,8 +55,7 @@ namespace ImageFetcherPlugin
             get
             {
                 // Version of the plugin.
-                // This code will pull the version from the assembly.
-                return Assembly.GetCallingAssembly().GetName().Version;
+                return Version.Parse("4.0.0.0");
             }
         }
 
