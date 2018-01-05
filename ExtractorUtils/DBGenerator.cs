@@ -73,9 +73,7 @@ namespace ExtractorUtils
                 {
                     OctgnName = propdef.Attribute("octgn_name").Value,
                     Run = new List<Run>(),
-                    IsRich = propdef.Attribute("isRich") == null ? false : bool.Parse(propdef.Attribute("isRich").Value),
-                    Capitalize = propdef.Attribute("capitalize") == null ? false : bool.Parse(propdef.Attribute("capitalize").Value),
-                    Delimiter = propdef.Attribute("delimiter") == null ? null : propdef.Attribute("delimiter").Value 
+                    IsRich = propdef.Attribute("isRich") == null ? false : bool.Parse(propdef.Attribute("isRich").Value)
                 };
 
                 var items = new List<XElement>();
@@ -89,6 +87,8 @@ namespace ExtractorUtils
                     var run = new Run()
                     {
                         Value = runitem.Attribute("value").Value,
+                        Capitalize = runitem.Attribute("capitalize") == null ? false : bool.Parse(runitem.Attribute("capitalize").Value),
+                        Delimiter = runitem.Attribute("delimiter") == null ? null : runitem.Attribute("delimiter").Value,
                         Replace = new Dictionary<string, string>(),
                         Type = (PropertyTypes) Enum.Parse(typeof (PropertyTypes),
                             runitem.Attribute("type") == null ? "STRING" : runitem.Attribute("type").Value.ToUpper())
@@ -152,12 +152,13 @@ namespace ExtractorUtils
                 
                 foreach (var prop in CardProperties)
                 {
-                    var valueList = new List<string>();
+                    string value = "";
                     foreach (var run in prop.Run)
                     {
+                        var valueList = new List<string>();
                         if (run.Type == PropertyTypes.STRING)
                         {
-                            valueList.Add(ProcessPropertyValue(run.Value, prop, run));
+                            valueList.Add(run.Value);
                         }
                         else
                         {
@@ -168,9 +169,10 @@ namespace ExtractorUtils
                             else
                                 valueList.Add(ProcessPropertyValue(valuetoken.ToString(), prop, run));
                         }
+                        value += String.Join(run.Delimiter, valueList.Where(x => !string.IsNullOrWhiteSpace(x)));
+
                     }
 
-                    var value = String.Join(prop.Delimiter, valueList.Where(x => !string.IsNullOrWhiteSpace(x)));
                     if (!string.IsNullOrWhiteSpace(value))
                         card.Properties.Add(prop, value);
                 }
@@ -259,7 +261,7 @@ namespace ExtractorUtils
                 {
                     value = value.Replace(replace.Key, replace.Value);
                 }
-                if (prop.Capitalize)
+                if (run.Capitalize)
                 {
                     value = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(value);
                 }

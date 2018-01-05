@@ -17,15 +17,15 @@ namespace ExtractorUtils.Entities
         public string Value { get; set; }
         public Dictionary<string, string> Replace { get; set; }
         public PropertyTypes Type { get; set; }
+        public string Delimiter { get; set; }
+        public bool Capitalize { get; set; }
     }
     
     public class Property
     {
         public bool IsRich { get; set; }
-        public bool Capitalize { get; set; }
         public string OctgnName { get; set; }
         public List<Run> Run { get; set; }
-        public string Delimiter { get; set; }
 
         public Property()
         { }

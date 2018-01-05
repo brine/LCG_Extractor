@@ -29,7 +29,7 @@ namespace DBExtractor
         public List<DBGenerator> databases;
 
         public DBGenerator database;
-        
+
 
         public MainWindow()
         {
@@ -39,17 +39,17 @@ namespace DBExtractor
             GamesList.ItemsSource = games;
 
         }
-        
+
         private void GameSelector(object sender, SelectionChangedEventArgs e)
         {
             var game = (Game)(sender as ComboBox).SelectedItem;
             database = databases.FirstOrDefault(x => x.gameGuid == game.Id);
             if (database == null)
-            { 
+            {
                 database = new DBGenerator(game);
                 databases.Add(database);
             };
-            
+
             SetsPanel.ItemsSource = database.setList;
         }
 
@@ -58,7 +58,7 @@ namespace DBExtractor
             if (e.NewValue is Set)
                 OutputGrid.ItemsSource = ((Set)e.NewValue).Cards;
         }
-        
+
         private void UpdateAllXml(object sender, RoutedEventArgs e)
         {
             foreach (var set in database.setList)
@@ -112,7 +112,7 @@ namespace DBExtractor
             root.AppendChild(cardsNode);
 
 
-            foreach (var c in set.Cards)
+            foreach (var c in set.Cards.OrderBy(x => x.Position))
             {
                 XmlNode cardNode = xml.CreateElement("card");
                 cardNode.Attributes.Append(CreateAttribute(xml, "name", c.Name));
@@ -143,10 +143,10 @@ namespace DBExtractor
                 }
                 cardsNode.AppendChild(cardNode);
             }
-                                                
+
             xml.Save(savePath);
         }
-        
+
         private XmlAttribute CreateAttribute(XmlDocument doc, string name, string value)
         {
             XmlAttribute ret = doc.CreateAttribute(name);
