@@ -19,6 +19,7 @@ namespace ExtractorUtils.Entities
         public PropertyTypes Type { get; set; }
         public string Delimiter { get; set; }
         public bool Capitalize { get; set; }
+        public string Format { get; set; }
     }
     
     public class Property

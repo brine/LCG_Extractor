@@ -112,7 +112,7 @@ namespace DBExtractor
             root.AppendChild(cardsNode);
 
 
-            foreach (var c in set.Cards.OrderBy(x => x.Position))
+            foreach (var c in set.Cards.OrderBy(x => x.Position, new AlphanumComparatorFast()))
             {
                 XmlNode cardNode = xml.CreateElement("card");
                 cardNode.Attributes.Append(CreateAttribute(xml, "name", c.Name));

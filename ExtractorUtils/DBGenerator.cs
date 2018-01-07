@@ -88,6 +88,7 @@ namespace ExtractorUtils
                     {
                         Value = runitem.Attribute("value").Value,
                         Capitalize = runitem.Attribute("capitalize") == null ? false : bool.Parse(runitem.Attribute("capitalize").Value),
+                        Format = runitem.Attribute("format") == null ? "{0}" : runitem.Attribute("format").Value,
                         Delimiter = runitem.Attribute("delimiter") == null ? null : runitem.Attribute("delimiter").Value,
                         Replace = new Dictionary<string, string>(),
                         Type = (PropertyTypes) Enum.Parse(typeof (PropertyTypes),
@@ -256,7 +257,7 @@ namespace ExtractorUtils
         {
             if (value != null)
             {
-                value = MakeXMLSafe(value);
+                value = string.Format(run.Format, MakeXMLSafe(value));
                 foreach (var replace in run.Replace)
                 {
                     value = value.Replace(replace.Key, replace.Value);
