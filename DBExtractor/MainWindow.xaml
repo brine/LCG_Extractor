@@ -38,7 +38,10 @@
                         <TextBlock Text="{Binding Name}" />
                     </HierarchicalDataTemplate>
                     <HierarchicalDataTemplate DataType="{x:Type entities:Set}" ItemsSource="{Binding Cards}">
-                        <TextBlock Text="{Binding Name}" />
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox IsChecked="{Binding Included}" />
+                            <TextBlock Text="{Binding Name}" />
+                        </StackPanel>
                     </HierarchicalDataTemplate>
                 </TreeView.Resources>
             </TreeView>
@@ -52,8 +55,8 @@
             </DataGrid>
         </Grid>
         <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="1">
-            <Button  Width="Auto" Margin="5" Content="Update selected set" Click="UpdateXml"/>
-            <Button  Width="Auto" Margin="5" Content="Update all OCTGN sets" Click="UpdateAllXml"/>
+            <Button  Width="Auto" Margin="5" Content="Update checked sets" Click="UpdateXml"/>
+            <Button  Width="Auto" Margin="5" Content="Update ALL sets" Click="UpdateAllXml"/>
         </StackPanel>
     </Grid>
 </Window>

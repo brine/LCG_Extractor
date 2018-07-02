@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ExtractorUtils</RootNamespace>
     <AssemblyName>ExtractorUtils</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
@@ -40,13 +40,13 @@
       <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Octgn.Core">
-      <HintPath>..\..\..\Documents\Octgn\OCTGN\Octgn.Core.dll</HintPath>
+      <HintPath>..\..\..\Octgn\OCTGN\Octgn.Core.dll</HintPath>
     </Reference>
     <Reference Include="Octgn.DataNew">
-      <HintPath>..\..\..\Documents\Octgn\OCTGN\Octgn.DataNew.dll</HintPath>
+      <HintPath>..\..\..\Octgn\OCTGN\Octgn.DataNew.dll</HintPath>
     </Reference>
     <Reference Include="Octgn.Library">
-      <HintPath>..\..\..\Documents\Octgn\OCTGN\Octgn.Library.dll</HintPath>
+      <HintPath>..\..\..\Octgn\OCTGN\Octgn.Library.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

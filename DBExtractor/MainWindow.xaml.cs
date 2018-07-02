@@ -73,11 +73,14 @@ namespace DBExtractor
 
         private void UpdateXml(object sender, RoutedEventArgs e)
         {
-            if (SetsPanel.SelectedItem == null) return;
-            SaveXml((Set)SetsPanel.SelectedItem);
+            if (database.setList.Where(x => x.Included).Count() == 0) return;
+            foreach (var set in database.setList.Where(x => x.Included))
+            {
+                SaveXml(set);
+            }
 
             string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            string saveDir = Path.Combine(dir, "Saved", database.gameGuid.ToString(), (SetsPanel.SelectedItem as Set).Guid);
+            string saveDir = Path.Combine(dir, "Saved", database.gameGuid.ToString());
 
             Process.Start(saveDir);
         }

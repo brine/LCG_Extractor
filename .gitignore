@@ -47,3 +47,7 @@ bin/
 obj/
 packages/
 !publish/
+*.lock
+*.ide-wal
+*.ide
+*.ide-shm

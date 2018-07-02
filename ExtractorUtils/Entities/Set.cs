@@ -12,6 +12,7 @@ namespace ExtractorUtils.Entities
         public string Guid { get; set; }
         public string SetCode { get; set; }
         public string SetNumber { get; set; }
+        public bool Included { get; set; }
 
         public List<Card> Cards { get; set; }
 
