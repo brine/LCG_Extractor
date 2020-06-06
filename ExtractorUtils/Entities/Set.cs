@@ -20,5 +20,9 @@ namespace ExtractorUtils.Entities
         {
             Cards = new List<Card>();
         }
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

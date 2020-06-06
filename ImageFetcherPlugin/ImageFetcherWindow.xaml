@@ -31,7 +31,7 @@
             <Image x:Name="dlImage" Grid.Column="1"/>
         </Grid>
         <StackPanel Grid.Row="2" Orientation="Horizontal">
-            <Button x:Name="GenerateBox" Content="Generate" Click="Generate"/>
+            <Button x:Name="GenerateBox" Content="Download Images" Click="GenerateButtonClicked"/>
             <Button x:Name="CancelBox" Content="Cancel" Click="CancelWorkers" Visibility="Collapsed"/>
             <TextBlock Text="Loading:" />
             <TextBlock x:Name="CurrentCard" />

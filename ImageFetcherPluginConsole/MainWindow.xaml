@@ -1,0 +1,16 @@
+﻿<Window x:Class="ImageFetcherPluginConsole.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ImageFetcherPluginConsole"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="100" Width="600">
+    <Grid>
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+            <TextBlock Text="Select Game:" Margin="5" VerticalAlignment="Center"/>
+            <ComboBox x:Name="GamesList" DisplayMemberPath="Name" Margin="5" Width="150" />
+            <Button Content="Load" Margin="5" Click="Button_Click" />
+        </StackPanel>
+    </Grid>
+</Window>

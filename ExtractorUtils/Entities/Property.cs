@@ -30,5 +30,10 @@ namespace ExtractorUtils.Entities
 
         public Property()
         { }
+
+        public override string ToString()
+        {
+            return OctgnName;
+        }
     }
 }

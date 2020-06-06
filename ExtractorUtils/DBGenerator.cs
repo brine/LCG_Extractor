@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using ExtractorUtils.Entities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Globalization;
-using Octgn.DataNew;
 using Octgn.Core.DataExtensionMethods;
 using Game = Octgn.DataNew.Entities.Game;
 using System.IO;
@@ -27,16 +25,20 @@ namespace ExtractorUtils
         public List<Symbol> Symbols = new List<Symbol>();
         public List<ImageSource> ImageSources = new List<ImageSource>();
         public Guid gameGuid;
+
+        public Octgn.DataNew.Entities.PropertyDef CardNumberProperty;
+
         public string cardNumberField;
-        public string octgnCardNumberField;
         public string cardNameField;
         public string packIdField;
         public string cardPackIdField;
         public string cardIdField;
         public string cardImageField;
 
+        private Game _game;
         public DBGenerator(Game game)
         {
+            _game = game;
             var directory = Path.Combine(game.InstallPath, "Extractor");
             if (!Directory.Exists(directory)) return;
             
@@ -47,7 +49,7 @@ namespace ExtractorUtils
             var gameData = doc.Document.Descendants("game").First();
 
             gameGuid = game.Id;
-            octgnCardNumberField = gameData.Attribute("cardOctgnNumber").Value;
+            CardNumberProperty = game.AllProperties().First(x => x.Name == gameData.Attribute("cardOctgnNumber").Value);
             cardNumberField = gameData.Attribute("cardNumber").Value;
             cardNameField = gameData.Attribute("cardName").Value;
             packIdField = gameData.Attribute("packId").Value;
@@ -238,14 +240,21 @@ namespace ExtractorUtils
                 setList.Add(set);
             }
         }
-        
+
+        private IEnumerable<Octgn.DataNew.Entities.Card> _cardsCache;
+        public IEnumerable<Octgn.DataNew.Entities.Card> CardsCache
+        {
+            get
+            {
+                if (_cardsCache == null)
+                    _cardsCache = _game.AllCards();
+                return _cardsCache;
+            }
+        }
         private string FindOctgnGuid(Card card)
         {
+            var octgnCard = CardsCache.FirstOrDefault(x => x.MatchesPropertyValue(CardNumberProperty, card.Position) && x.SetId.ToString() == card.Set.Guid);
 
-            var octgnCard = DbContext.Get().GameById(gameGuid).AllCards()
-                        .FirstOrDefault(x => x.Properties[""].Properties
-                        .First(y => y.Key.Name == octgnCardNumberField).Value.ToString() == card.Position
-                        && x.SetId.ToString() == card.Set.Guid);
             if (octgnCard != null)
             {
                 return octgnCard.Id.ToString();

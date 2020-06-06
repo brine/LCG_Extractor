@@ -18,6 +18,7 @@ using Octgn.DataNew;
 using Octgn.DataNew.Entities;
 using Set = ExtractorUtils.Entities.Set;
 using System.Diagnostics;
+using Octgn.Library;
 
 namespace DBExtractor
 {
@@ -35,6 +36,7 @@ namespace DBExtractor
         {
             this.InitializeComponent();
             databases = new List<DBGenerator>();
+            Config.Instance = new Config(); 
             var games = DbContext.Get().Games.Where(x => DBGenerator.ValidGame(x));
             GamesList.ItemsSource = games;
 

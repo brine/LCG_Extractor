@@ -1,10 +1,8 @@
-﻿using Newtonsoft.Json.Linq;
-using Octgn.Core.DataExtensionMethods;
+﻿using Octgn.Core.DataExtensionMethods;
 using Octgn.DataNew.Entities;
 using Octgn.Library;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -13,6 +11,8 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 using ExtractorUtils;
 using Octgn.DataNew;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ImageFetcherPlugin
 {
@@ -21,13 +21,15 @@ namespace ImageFetcherPlugin
     /// </summary>
     public partial class ImageFetcherWindow : Window
     {
-        private BackgroundWorker backgroundWorker = new BackgroundWorker();
+
+        private CancellationTokenSource _cts;
+
         public IEnumerable<Card> cards;
         public DBGenerator database;
 
         public bool OverwriteBool = false;
         public int SelectedItemSource = 0;
-        
+
         public ImageFetcherWindow()
         {
             //var game = DbContext.Get().GameById(Guid.Parse("bb0f02e7-2a6f-4ae3-84a2-c501b4176844")) ?? throw new Exception("Legend of the Five Rings is not installed!");
@@ -49,118 +51,122 @@ namespace ImageFetcherPlugin
             this.InitializeComponent();
 
             DbComboBox.ItemsSource = database.ImageSources;
+
             this.Closing += CancelWorkers;
-            backgroundWorker.WorkerReportsProgress = true;
-            backgroundWorker.WorkerSupportsCancellation = true;
-            backgroundWorker.DoWork += DoWork;
-            backgroundWorker.ProgressChanged += ProgressChanged;
-            backgroundWorker.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
         }
 
-        private void Generate(object sender, RoutedEventArgs e)
+        private async void GenerateButtonClicked(object sender, RoutedEventArgs e)
         {
-            if (backgroundWorker.IsBusy)
+
+            _cts = new CancellationTokenSource();
+            var token = _cts.Token;
+            var progressHandler = new Progress<WorkerItem>(workerItem =>
             {
-                CurrentCard.Text = "Busy";
-                return;
-            }
+                ProgressChanged(workerItem);
+            });
+            var progress = progressHandler as IProgress<WorkerItem>;
+
             ProgressBar.Maximum = cards.Count();
             DbComboBox.IsEnabled = false;
             OverwriteCheckbox.IsEnabled = false;
             GenerateBox.Visibility = Visibility.Collapsed;
             CancelBox.Visibility = Visibility.Visible;
-            backgroundWorker.RunWorkerAsync();
+
+            await Task.Run(() =>
+            {
+                var i = 0;
+                foreach (var card in cards)
+                {
+                    var workerItem = new WorkerItem() { Card = card, progress = i++ };
+                    if (token.IsCancellationRequested)
+                        break;
+                    DoWork(workerItem);
+                    Thread.Sleep(10);
+                    progress.Report(workerItem);
+                }
+            });
+            CurrentCard.Text = "DONE";
+            WorkerCompleted();
         }
 
 
-        void DoWork(object sender, DoWorkEventArgs e)
+        private void DoWork(WorkerItem worker)
         {
-            var i = 0;
+            var dbcard = database.cardList.FirstOrDefault(x => x.Id == worker.Card.Id.ToString());
+            if (dbcard == null) return;
 
-            foreach (var card in cards)
+            var cardset = worker.Card.GetSet();
+
+            var garbage = Config.Instance.Paths.GraveyardPath;
+            if (!Directory.Exists(garbage)) Directory.CreateDirectory(garbage);
+
+            var imageUri = worker.Card.GetImageUri();
+
+            var files =
+                Directory.GetFiles(cardset.ImagePackUri, imageUri + ".*")
+                    .Where(x => System.IO.Path.GetFileNameWithoutExtension(x).Equals(imageUri, StringComparison.InvariantCultureIgnoreCase))
+                    .OrderBy(x => x.Length)
+                    .ToArray();
+
+            if (files.Length > 0 && OverwriteBool == false)
             {
-                if (backgroundWorker.CancellationPending) break;
-                i++;
-                var dbcard = database.cardList.FirstOrDefault(x => x.Id == card.Id.ToString());
-                if (dbcard == null) continue;
+                return;
+            }
 
-                var cardset = card.GetSet();
 
-                var garbage = Config.Instance.Paths.GraveyardPath;
-                if (!Directory.Exists(garbage)) Directory.CreateDirectory(garbage);
+            var url = "";
+            var newPath = "";
 
-                var imageUri = card.GetImageUri();
+            url = string.Format(database.ImageSources[SelectedItemSource].Url, dbcard.Image, dbcard.Position, dbcard.Name, dbcard.Id, dbcard.Set.SetNumber, dbcard.Set.SetCode);
+            newPath = System.IO.Path.Combine(cardset.ImagePackUri, imageUri);
 
-                var files =
-                    Directory.GetFiles(cardset.ImagePackUri, imageUri + ".*")
-                        .Where(x => System.IO.Path.GetFileNameWithoutExtension(x).Equals(imageUri, StringComparison.InvariantCultureIgnoreCase))
-                        .OrderBy(x => x.Length)
-                        .ToArray();
-                
-                if (files.Length > 0 && OverwriteBool == false)
+            using (WebClient webClient = new WebClient())
+            {
+                try
                 {
-                    //skip overwrite if a saved image was located and overwrite is set to false 
-                    backgroundWorker.ReportProgress(i, card);
-                    continue;
-                }
-                
-                
-                var url = "";
-                var newPath = "";
+                    byte[] fileBytes = webClient.DownloadData(url);
 
+                    string fileType = webClient.ResponseHeaders[HttpResponseHeader.ContentType];
 
-                url = string.Format(database.ImageSources[SelectedItemSource].Url, dbcard.Image, dbcard.Position, dbcard.Name, dbcard.Id, dbcard.Set.SetNumber, dbcard.Set.SetCode);
-                newPath = System.IO.Path.Combine(cardset.ImagePackUri, imageUri);
-
-                using (WebClient webClient = new WebClient())
-                {
-                    try
+                    if (fileType != null)
                     {
-                        byte[] fileBytes = webClient.DownloadData(url);
-
-                        string fileType = webClient.ResponseHeaders[HttpResponseHeader.ContentType];
-
-                        if (fileType != null)
+                        switch (fileType)
                         {
-                            switch (fileType)
-                            {
-                                case "image/jpeg":
-                                    newPath += ".jpg";
-                                    foreach (var f in files.Select(x => new FileInfo(x)))
-                                        f.MoveTo(System.IO.Path.Combine(garbage, f.Name));
-                                    System.IO.File.WriteAllBytes(newPath, fileBytes);
-                                    break;
-                                case "image/gif":
-                                    newPath += ".gif";
-                                    foreach (var f in files.Select(x => new FileInfo(x)))
-                                        f.MoveTo(System.IO.Path.Combine(garbage, f.Name));
-                                    System.IO.File.WriteAllBytes(newPath, fileBytes);
-                                    break;
-                                case "image/png":
-                                    newPath += ".png";
-                                    foreach (var f in files.Select(x => new FileInfo(x)))
-                                        f.MoveTo(System.IO.Path.Combine(garbage, f.Name));
-                                    System.IO.File.WriteAllBytes(newPath, fileBytes);
-                                    break;
-                                default:
-                                    break;
-                            }
+                            case "image/jpeg":
+                                newPath += ".jpg";
+                                foreach (var f in files.Select(x => new FileInfo(x)))
+                                    f.MoveTo(System.IO.Path.Combine(garbage, f.Name));
+                                System.IO.File.WriteAllBytes(newPath, fileBytes);
+                                break;
+                            case "image/gif":
+                                newPath += ".gif";
+                                foreach (var f in files.Select(x => new FileInfo(x)))
+                                    f.MoveTo(System.IO.Path.Combine(garbage, f.Name));
+                                System.IO.File.WriteAllBytes(newPath, fileBytes);
+                                break;
+                            case "image/png":
+                                newPath += ".png";
+                                foreach (var f in files.Select(x => new FileInfo(x)))
+                                    f.MoveTo(System.IO.Path.Combine(garbage, f.Name));
+                                System.IO.File.WriteAllBytes(newPath, fileBytes);
+                                break;
+                            default:
+                                break;
                         }
                     }
-                    catch
-                    {
-
-                    }
                 }
-                backgroundWorker.ReportProgress(i, card);
+                catch
+                {
+
+                }
             }
         }
 
-        private void ProgressChanged(object sender, ProgressChangedEventArgs e)
+        private void ProgressChanged(WorkerItem worker)
         {
-            ProgressBar.Value = e.ProgressPercentage;
-            CurrentCard.Text = (e.UserState as Card).Name;
-            Stream imageStream = File.OpenRead((e.UserState as Card).GetPicture());
+            ProgressBar.Value = worker.progress;
+            CurrentCard.Text = worker.Card.Name;
+            Stream imageStream = File.OpenRead(worker.Card.GetPicture());
             imageStream.Position = 0;
 
             var ret = new BitmapImage();
@@ -176,26 +182,22 @@ namespace ImageFetcherPlugin
 
         }
 
-        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void CancelWorkers(object sender, EventArgs e)
         {
-            CurrentCard.Text = "DONE";
+            if (_cts != null)
+            {
+                _cts.Cancel();
+                CurrentCard.Text = "Cancel";
+                WorkerCompleted();
+            }
+        }
+
+        private void WorkerCompleted()
+        {
             DbComboBox.IsEnabled = true;
             OverwriteCheckbox.IsEnabled = true;
             GenerateBox.Visibility = Visibility.Visible;
             CancelBox.Visibility = Visibility.Collapsed;
-        }
-
-        private void CancelWorkers(object sender, EventArgs e)
-        {
-            if (backgroundWorker.IsBusy)
-            {
-                CurrentCard.Text = "Cancel";
-                backgroundWorker.CancelAsync();
-                DbComboBox.IsEnabled = true;
-                OverwriteCheckbox.IsEnabled = true;
-                GenerateBox.Visibility = Visibility.Visible;
-                CancelBox.Visibility = Visibility.Collapsed;
-            }
         }
 
         private void Overwrite(object sender, RoutedEventArgs e)
@@ -207,5 +209,11 @@ namespace ImageFetcherPlugin
         {
             SelectedItemSource = (sender as ComboBox).SelectedIndex;
         }
+    }
+
+    public class WorkerItem
+    {
+        public int progress { get; set; }
+        public Card Card { get; set; }
     }
 }

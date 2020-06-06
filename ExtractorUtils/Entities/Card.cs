@@ -22,6 +22,11 @@ namespace ExtractorUtils.Entities
             Properties = new Dictionary<Property, string>();
         }
 
+        public override string ToString()
+        {
+            return Name;
+        }
+
         public string GetProperty(string propName)
         {
             return Properties.First(x => x.Key.OctgnName == propName).Value;
